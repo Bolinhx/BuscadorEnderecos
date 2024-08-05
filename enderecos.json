@@ -1,0 +1,18 @@
+[
+  {
+    "cep": "31140-170",
+    "nome": "Rua São Roque",
+    "bairro": "Graça",
+    "cidade": "Belo Horizonte",
+    "uf": "MG",
+    "erro": false
+  },
+  {
+    "cep": "31980-210",
+    "nome": "Rua Anapurus",
+    "bairro": "São Gabriel",
+    "cidade": "Belo Horizonte",
+    "uf": "MG",
+    "erro": false
+  }
+]
