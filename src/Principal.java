@@ -1,5 +1,7 @@
+import Models.ConsultaCep;
 import Models.EnderecoViaCep;
 import Models.Enderecos;
+import Models.GeradorDeArquivo;
 import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -20,9 +22,7 @@ public class Principal {
         String busca = "";
         List<Enderecos> enderecos = new ArrayList<>();
 
-        Gson gson = new GsonBuilder()
-                .setPrettyPrinting()
-                .create();
+
 
         while(!busca.equalsIgnoreCase("sair")) {
 
@@ -32,44 +32,31 @@ public class Principal {
             if(busca.equalsIgnoreCase("sair")){
                 break;
             }
-
-
-            String endereco = "https://viacep.com.br/ws/" + busca + "/json/";
             //System.out.println(endereco);
-
-
             try {
-                HttpClient client = HttpClient.newHttpClient();
-                HttpRequest request = HttpRequest.newBuilder()
-                        .uri(URI.create(endereco))
-                        .build();
+                ConsultaCep consultaCep = new ConsultaCep();
+                consultaCep.buscaEndereco(busca);
 
-                HttpResponse<String> response = client
-                        .send(request, HttpResponse.BodyHandlers.ofString());
+                EnderecoViaCep meuEnderecoViaCep = consultaCep.buscaEndereco(busca);
+                Enderecos meuEndereco = new Enderecos(meuEnderecoViaCep);
+                System.out.println(meuEndereco);
 
-                String json = response.body();
-                //System.out.println(json);
+                    if(meuEnderecoViaCep.erro()){
+                        System.out.println("Digite um endereco valido");
+                    }else{
+                        enderecos.add(meuEndereco);
+                    }
 
-                EnderecoViaCep enderecoViaCep = gson.fromJson(json, EnderecoViaCep.class);
-                //System.out.println(enderecoViaCep);
 
-                Enderecos meuEndereco = new Enderecos(enderecoViaCep);
-                //System.out.println(meuEndereco);
-                if(enderecoViaCep.erro()){
-                    System.out.println("Cep inexistente, digite um cep valido");
-                }else {
-                    enderecos.add(meuEndereco);
-                }
-
-            } catch (Exception e) {
-                throw new RuntimeException(e);
+            } catch (RuntimeException e) {
+                System.out.println(e.getMessage());
+                System.out.println("Finalizando aplicacao");
             }
         }
+        GeradorDeArquivo gerador = new GeradorDeArquivo();
+        gerador.salvaJson(enderecos);
         System.out.println(enderecos);
 
-        FileWriter write = new FileWriter("enderecos.json");
-        write.write(gson.toJson(enderecos));
-        write.close();
         System.out.println("O programa fechou corretamente");
     }
 }
